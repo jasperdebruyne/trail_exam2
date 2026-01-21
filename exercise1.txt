@@ -1,1 +1,4 @@
-testje
+1) Create the repository on github
+2) Clone it to your personal pc --> git clone git@github.com:jasperdebruyne/trial_exam2.git
+3) git add .
+4) git commit -m "This is the first exercise to clone and push files to your pc/github"
