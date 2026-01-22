@@ -12,3 +12,9 @@ db.restaurants.find({cuisine:{$in:['American','Chinese']},borough:'Bronx’})
 db.restaurants.find({borough:{$nin:['Staten Island','Queens','Brooklyn','Bronx']}},{restaurant_id:1, borough:1})
 
 db.restaurants.find({borough:{$nin:['Staten Island','Queens','Brooklyn','Bronx']}},{restaurant_id:1, borough:1, _id:0})
+
+db.restaurants.find({grades:{$elemMatch:{grade:"A", score:11, date: ISODate("2014-08-11T00:00:00Z")}}},{restaurant_id:1, borough:1, grades:1, _id:0})
+
+db.restaurants.find({},{name:1, cuisine:1, _id:0, borough:1}).sort({cuisine:1, borough: -1})
+
+db.restaurants.find({"address.street":{$exists:false}})
