@@ -1,0 +1,14 @@
+curl 'https://rest.ensembl.org/sequence/region/human/13:32889000..32891000:1?mask=soft' -H 'Content-type:text/x-fasta’
+
+curl 'https://rest.ensembl.org/sequence/region/human/13:32889000..32891000:1?mask=hard' -H 'Content-type:text/x-fasta’
+
+curl 'https://rest.ensembl.org/xrefs/symbol/homo_sapiens/CCR5?' -H 'Content-type:application/json’
+
+curl 'https://rest.ensembl.org/homology/id/human/ENSG00000160791?type=orthologues;sequence=cdna;target_taxon=9598;target_species=pan_troglodytes' -H 'Content-type:application/json’
+
+curl 'https://rest.ensembl.org/sequence/id/ENST00000001146?' -H 'Content-type:text/x-fasta’
+
+curl 'https://rest.ensembl.org/archive/id' -H 'Content-type:application/json' -H 'Accept:application/json' -X POST -d '{ "id" : ["ENSG00000002587", "ENSG00000003056"] }’
+
+curl 'https://rest.ensembl.org/sequence/region/human/7:35182..35431:1?' -H 'Content-type:text/plain’
+Bij oefening 7: +249 doen in plaats van 250 (anders zal 1 teveel gegeven worden)
