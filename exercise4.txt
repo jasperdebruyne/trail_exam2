@@ -1,0 +1,155 @@
+select * from guest where guestaddress LIKE "%London%" ORDER BY guestname ASC;
++---------+--------------+--------------------+
+| guestno | guestname    | guestaddress       |
++---------+--------------+--------------------+
+|   10001 | John Kay     | 56 High St, London |
+|   10002 | Mike Ritchie | 18 Tain St, London |
++---------+--------------+--------------------+
+
+
+select * from room WHERE type in ("double", "family") and price < 40 ORDER BY price ASC;
++--------+---------+--------+-------+
+| roomno | hotelno | type   | price |
++--------+---------+--------+-------+
+|    801 | ch02    | double | 15.00 |
+|    601 | fb01    | double | 29.00 |
+|   1001 | dc01    | double | 30.00 |
+|   1101 | dc01    | family | 35.00 |
+|    701 | fb01    | family | 39.00 |
++--------+---------+--------+-------+
+
+select * from booking where dateto is NULL;
++---------+---------+------------+--------+--------+
+| hotelno | guestno | datefrom   | dateto | roomno |
++---------+---------+------------+--------+--------+
+| ch01    |   10006 | 2023-04-21 | NULL   |   1101 |
+| dc01    |   10003 | 2023-05-20 | NULL   |   1001 |
+| fb01    |   10001 | 2023-05-01 | NULL   |    701 |
++---------+---------+------------+--------+--------+
+
+
+select type, avg(price) from room group by type order by price asc;
++--------+------------+
+| type   | avg(price) |
++--------+------------+
+| single |  26.998000 |
+| double |  40.000000 |
+| family |  44.663333 |
++--------+------------+
+
+
+select type, sum(price) from room where type = "double";
++--------+------------+
+| type   | sum(price) |
++--------+------------+
+| double |     160.00 |
++--------+------------+
+
+
+SELECT count(DISTINCT guestno) AS UniqueGuests FROM booking WHERE month(datefrom) = 8;
++--------------+
+| UniqueGuests |
++--------------+
+|            0 |
++--------------+
+
+
+select hotel.hotelno, hotel.hotelname, room.type, room.price from hotel JOIN room ON hotel.hotelno = room.hotelno where hotelname = "The Tower Hotel";
++---------+-----------------+--------+-------+
+| hotelno | hotelname       | type   | price |
++---------+-----------------+--------+-------+
+| fb01    | The Tower Hotel | single | 19.00 |
+| fb01    | The Tower Hotel | double | 29.00 |
+| fb01    | The Tower Hotel | family | 39.00 |
++---------+-----------------+--------+-------+
+
+
+SELECT guest.guestname AS GuestAtTheMoment FROM guest JOIN booking ON guest.guestno = booking.guestno JOIN hotel ON booking.hotelno = hotel.hotelno WHERE hotel.hotelname = "The Tower Hotel" AND current_date() BETWEEN booking.datefrom AND booking.dateto;
+
+
+SELECT guest.guestname AS GuestAtTheMoment FROM guest JOIN booking ON guest.guestno = booking.guestno JOIN hotel ON booking.hotelno = hotel.hotelno WHERE hotel.hotelname = "The Tower Hotel" AND CURRENT_DATE() >= booking.datefrom AND (CURRENT_DATE() <= booking.dateto OR booking.dateto IS NULL);
++------------------+
+| GuestAtTheMoment |
++------------------+
+| John Kay         |
++------------------+
+1 row in set (0.000 sec)
+
+SELECT hotel.hotelname, room.roomno, room.type, room.price, IFNULL(guest.guestname, 'Nobody') as guestname FROM room JOIN hotel ON room.hotelno = hotel.hotelno LEFT JOIN booking ON room.hotelno = booking.hotelno AND room.roomno = booking.roomno AND CURRENT_DATE() BETWEEN booking.datefrom AND IFNULL(booking.dateto, '2099-12-31') LEFT JOIN guest ON booking.guestno = guest.guestno WHERE hotel.hotelname = "The Tower Hotel";
++-----------------+--------+--------+-------+-----------+
+| hotelname       | roomno | type   | price | guestname |
++-----------------+--------+--------+-------+-----------+
+| The Tower Hotel |    501 | single | 19.00 | Nobody    |
+| The Tower Hotel |    601 | double | 29.00 | Nobody    |
+| The Tower Hotel |    701 | family | 39.00 | John Kay  |
++-----------------+--------+--------+-------+-----------+
+3 rows in set (0.001 sec)
+
+SELECT hotel.hotelname, sum(room.price) AS IncomeToday FROM room JOIN hotel ON room.hotelno = hotel.hotelno JOIN booking ON room.roomno = booking.roomno AND room.hotelno = booking.hotelno WHERE hotel.hotelname = "The Tower Hotel" AND booking.dateto IS NULL;
++-----------------+-------------+
+| hotelname       | IncomeToday |
++-----------------+-------------+
+| The Tower Hotel |       39.00 |
++-----------------+-------------+
+1 row in set (0.001 sec)
+
+SELECT DISTINCT hotel.hotelname, booking.roomno FROM booking JOIN hotel ON booking.hotelno = hotel.hotelno WHERE hotel.hotelname = "The Tower Hotel" AND booking.dateto
+IS NOT NULL;
++-----------------+--------+
+| hotelname       | roomno |
++-----------------+--------+
+| The Tower Hotel |    501 |
+| The Tower Hotel |    601 |
++-----------------+--------+
+2 rows in set (0.001 sec)
+
+ELECT DISTINCT hotel.hotelname, booking.roomno, room.price FROM booking JOIN hotel ON booking.hotelno = hotel.hotelno JOIN room ON booking.roomno = room.roomno WHERE hotel.hotelname = "The Tower Hotel" AND booking.dateto IS NOT NULL;
++-----------------+--------+-------+
+| hotelname       | roomno | price |
++-----------------+--------+-------+
+| The Tower Hotel |    501 | 19.00 |
+| The Tower Hotel |    601 | 29.00 |
++-----------------+--------+-------+
+2 rows in set (0.001 sec)
+
+SELECT hotel.hotelname, count(room.roomno) FROM room JOIN hotel ON room.hotelno = hotel.hotelno WHERE hotel.city = "London" GROUP BY hotel.hotelname;
++-----------------+--------------------+
+| hotelname       | count(room.roomno) |
++-----------------+--------------------+
+| Omni Shoreham   |                  2 |
+| Phoenix Park    |                  2 |
+| The Tower Hotel |                  3 |
++-----------------+--------------------+
+3 rows in set (0.001 sec)
+
+SELECT hotel.hotelname, room.type, COUNT(*) AS num_bookings FROM room JOIN booking ON room.hotelno = booking.hotelno AND room.roomno = booking.roomno JOIN hotel ON booking.hotelno = hotel.hotelno WHERE hotel.city = "London" GROUP BY hotel.hotelno, room.type ORDER BY hotel.hotelname, COUNT(*) DESC;
++-----------------+--------+--------------+
+| hotelname       | type   | num_bookings |
++-----------------+--------+--------------+
+| Omni Shoreham   | family |            1 |
+| Phoenix Park    | double |            1 |
+| The Tower Hotel | single |            2 |
+| The Tower Hotel | double |            2 |
+| The Tower Hotel | family |            1 |
++-----------------+--------+--------------+
+5 rows in set (0.001 sec)
+
+UPDATE room SET price = price * 1.05;
++--------+---------+--------+-------+
+| roomno | hotelno | type   | price |
++--------+---------+--------+-------+
+|    501 | fb01    | single | 19.95 |
+|    601 | fb01    | double | 30.45 |
+|    701 | ch02    | single | 10.50 |
+|    701 | fb01    | family | 40.95 |
+|    801 | ch02    | double | 15.75 |
+|    901 | dc01    | single | 18.90 |
+|   1001 | ch01    | single | 31.49 |
+|   1001 | dc01    | double | 31.50 |
+|   1001 | fb02    | single | 60.90 |
+|   1101 | ch01    | family | 62.99 |
+|   1101 | dc01    | family | 36.75 |
+|   1101 | fb02    | double | 90.30 |
++--------+---------+--------+-------+
+12 rows in set (0.000 sec)
+
