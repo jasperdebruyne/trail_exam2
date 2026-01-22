@@ -1,1 +1,25 @@
 **Exercise 2:**
+
+UNF:
+DB(staffNo, dentistname, patientNo, patientName, appdate, apptime, sergeryno)
+
+1NF:
+DB(*staffNo*, dentistname, patientNo, patientName, *appdate*, *apptime*, sergeryno)
+
+
+2NF:
+Geen enkele kolom mag bepaald worden door 1 deel van de PK
+
+DB(*staffNo*, patientNo, patientName, *appdate*, *apptime*)
+
+Dentist(*staffno*, dentistname )
+surgeryDate(*staffno*, *appdate*, surgeryNo)
+
+3NF:
+als de niet PK van elkaar afhankelijk zijn, verder opsplitsen
+
+patient(*patientNo*, PatientName)
+DB(*staffNo*, patientNo, *appdate*, *apptime*)
+dentist(*staffNo*, dentistname)
+surgeryDate(*staffno*, *appdate*, surgeryNo
+
